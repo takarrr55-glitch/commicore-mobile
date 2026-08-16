@@ -11,17 +11,9 @@ public final class FlowSettingsPrefs {
         return c.getSharedPreferences(PREF, Context.MODE_PRIVATE);
     }
 
-    public static String get(Context c, String key, String def) {
-        return p(c).getString(key, def);
-    }
-
-    public static boolean getBool(Context c, String key, boolean def) {
-        return p(c).getBoolean(key, def);
-    }
-
-    public static int getInt(Context c, String key, int def) {
-        return p(c).getInt(key, def);
-    }
+    public static String get(Context c, String key, String def) { return p(c).getString(key, def); }
+    public static boolean getBool(Context c, String key, boolean def) { return p(c).getBoolean(key, def); }
+    public static int getInt(Context c, String key, int def) { return p(c).getInt(key, def); }
 
     public static void save(Context c,
                             String videoType,
@@ -57,14 +49,12 @@ public final class FlowSettingsPrefs {
             .apply();
     }
 
-    public static boolean configured(Context c) {
-        return p(c).getBoolean("configured", false);
-    }
+    public static boolean configured(Context c) { return p(c).getBoolean("configured", false); }
 
     public static String summary(Context c) {
         return "Mode: " + get(c,"videoType","Frames") +
             "\nImage: " + get(c,"imageModel","Nano Banana 2") + " • " + get(c,"imageAspect","9:16") + " • " + get(c,"imageScale","1x") +
-            "\nVideo: " + get(c,"videoModel","Veo 3.1 - Quality") + " • " + get(c,"videoAspect","9:16") + " • " + get(c,"videoScale","1x") + " • " + get(c,"duration","8s") +
+            "\nVideo: " + get(c,"videoModel","Veo 3.1 Lite") + " • " + get(c,"videoAspect","9:16") + " • " + get(c,"videoScale","1x") + " • " + get(c,"duration","8s") +
             "\nDownload: " + get(c,"quality","1080p Upscaled") +
             "\nScenes: " + getInt(c,"sceneCount",1);
     }

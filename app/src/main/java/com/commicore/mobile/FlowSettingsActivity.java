@@ -22,18 +22,20 @@ public class FlowSettingsActivity extends Activity {
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
         ScrollView sc = new ScrollView(this);
+        sc.setFillViewport(true);
         LinearLayout root = Ui.vertical(this);
         sc.addView(root);
 
         root.addView(Ui.title(this,"ตั้งค่า Google Flow",24));
         root.addView(Ui.body(this,
-            "เมนูนี้เป็น Clean-room implementation ของเราเอง: ตั้งค่ากระบวนการสร้างภาพ/วิดีโอให้ครบก่อนส่งไปหน้า Flow โดยไม่ดัก token หรือคัดลอกโค้ดจากแอปต้นแบบ"));
+            "ตั้งค่ากระบวนการสร้างภาพ/วิดีโอของ CommiCore ให้ตรงกับตัวเลือกที่ต้องการใช้ใน Flow. " +
+            "ตัวเลือกชื่อโมเดลเป็นค่าที่ CommiCore เก็บไว้สำหรับ workflow ของเรา และอาจไม่ตรงกับชื่อที่ Google แสดงทุกบัญชี/ทุกช่วงเวลา"));
 
         videoType = addSpinner(root,"โหมดวิดีโอ", new String[]{"Frames","Ingredients","Text to Video"}, FlowSettingsPrefs.get(this,"videoType","Frames"));
         imageModel = addSpinner(root,"โมเดลภาพ", new String[]{"Nano Banana 2","Imagen 4","Default"}, FlowSettingsPrefs.get(this,"imageModel","Nano Banana 2"));
         imageAspect = addSpinner(root,"สัดส่วนภาพ", new String[]{"9:16","16:9","1:1","4:5"}, FlowSettingsPrefs.get(this,"imageAspect","9:16"));
         imageScale = addSpinner(root,"จำนวน/Scale ภาพ", new String[]{"1x","2x","4x"}, FlowSettingsPrefs.get(this,"imageScale","1x"));
-        videoModel = addSpinner(root,"โมเดลวิดีโอ", new String[]{"Veo 3.1 - Quality","Veo 3.1 - Fast","Default"}, FlowSettingsPrefs.get(this,"videoModel","Veo 3.1 - Quality"));
+        videoModel = addSpinner(root,"โมเดลวิดีโอ", new String[]{"Veo 3.1 Lite","Veo 3.1 - Quality","Veo 3.1 - Fast","Veo 3.1","Default"}, FlowSettingsPrefs.get(this,"videoModel","Veo 3.1 Lite"));
         videoAspect = addSpinner(root,"สัดส่วนวิดีโอ", new String[]{"9:16","16:9"}, FlowSettingsPrefs.get(this,"videoAspect","9:16"));
         videoScale = addSpinner(root,"จำนวน/Scale วิดีโอ", new String[]{"1x","2x","4x"}, FlowSettingsPrefs.get(this,"videoScale","1x"));
         duration = addSpinner(root,"ความยาววิดีโอ", new String[]{"8s","6s","4s"}, FlowSettingsPrefs.get(this,"duration","8s"));
