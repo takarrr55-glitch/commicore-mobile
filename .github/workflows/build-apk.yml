@@ -42,13 +42,13 @@ jobs:
       - name: Prepare APK
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/CommiCore-Mobile-v0.7.apk
-          sha256sum dist/CommiCore-Mobile-v0.7.apk > dist/SHA256.txt
+          cp app/build/outputs/apk/debug/app-debug.apk dist/CommiCore-Mobile-v0.8.apk
+          sha256sum dist/CommiCore-Mobile-v0.8.apk > dist/SHA256.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CommiCore-Mobile-v0.7
+          name: CommiCore-Mobile-v0.8
           path: dist/
           retention-days: 1
           if-no-files-found: error
