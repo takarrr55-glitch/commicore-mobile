@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -76,6 +77,15 @@ public class AffiliateLoginActivity extends Activity {
 
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient(){
+            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return ShopeeUrlRouter.handle(AffiliateLoginActivity.this, view, url);
+            }
+
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url = request == null || request.getUrl() == null ? null : request.getUrl().toString();
+                return ShopeeUrlRouter.handle(AffiliateLoginActivity.this, view, url);
+            }
+
             @Override public void onPageFinished(WebView view,String url) {
                 super.onPageFinished(view,url);
                 status.setText("Shopee Affiliate • ลากขึ้น/ลงได้ • " + (url==null?"":url));
