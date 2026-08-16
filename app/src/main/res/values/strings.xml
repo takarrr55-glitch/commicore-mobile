@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CommiCore Mobile</string>
+    <string name="accessibility_desc">CommiCore ช่วยกรอก Prompt และ Caption ใน Chrome / Google Flow / Shopee ตามคำสั่งที่ผู้ใช้กดจากแอป โดยไม่ส่งข้อมูลไปเซิร์ฟเวอร์ของ CommiCore</string>
+</resources>
