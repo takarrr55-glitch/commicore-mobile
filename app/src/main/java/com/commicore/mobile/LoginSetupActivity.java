@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,11 +16,16 @@ public class LoginSetupActivity extends Activity {
 
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
+
+        ScrollView sc = new ScrollView(this);
+        sc.setFillViewport(true);
         LinearLayout root = Ui.vertical(this);
+        sc.addView(root);
+
         root.addView(Ui.title(this, "ตั้งค่าก่อนเริ่มทำงาน", 24));
         root.addView(Ui.body(this,
             "ลำดับ: Login Shopee Affiliate → Login Google Flow → ตั้งค่า Flow → เข้า Affiliate Product Analyzer. " +
-            "หน้า Shopee Affiliate จะเปิดเต็มจอแยกต่างหากเพื่อให้เลื่อนและ Login ได้สะดวก"));
+            "หน้านี้เลื่อนขึ้น-ลงได้ทั้งหมด และหน้า Shopee Affiliate จะเปิดเต็มจอแยกต่างหาก"));
 
         status = Ui.body(this, "");
         root.addView(status);
@@ -83,7 +89,7 @@ public class LoginSetupActivity extends Activity {
             refreshStatus();
         });
 
-        setContentView(root);
+        setContentView(sc);
         refreshStatus();
     }
 
