@@ -20,6 +20,7 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
 
+        <activity android:name=".AffiliateLoginActivity" android:exported="false" />
         <activity android:name=".ProductDetailActivity" android:exported="false" />
         <activity android:name=".ProductListActivity" android:exported="false" />
         <activity android:name=".ProductScannerActivity" android:exported="false" />
