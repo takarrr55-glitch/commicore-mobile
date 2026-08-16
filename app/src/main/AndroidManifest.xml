@@ -23,6 +23,7 @@
         <activity android:name=".ProductDetailActivity" android:exported="false" />
         <activity android:name=".ProductListActivity" android:exported="false" />
         <activity android:name=".ProductScannerActivity" android:exported="false" />
+        <activity android:name=".FlowSettingsActivity" android:exported="false" />
         <activity android:name=".LoginSetupActivity" android:exported="false" />
 
         <activity android:name=".MainActivity" android:exported="true">
