@@ -2,13 +2,13 @@ package com.commicore.mobile;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,40 +17,127 @@ import org.json.JSONArray;
 
 public class ProductScannerActivity extends Activity {
     private static final String AFFILIATE_URL="https://affiliate.shopee.co.th/";
-    private WebView web; private TextView status; private DbHelper db;
+    private WebView web;
+    private TextView status;
+    private DbHelper db;
 
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
         if(!LoginPrefs.shopeeReady(this) || !LoginPrefs.flowReady(this)) {
-            Toast.makeText(this,"กรุณา Login Shopee Affiliate และ Google Flow ก่อน",Toast.LENGTH_LONG).show(); finish(); return;
+            Toast.makeText(this,"กรุณา Login Shopee Affiliate และ Google Flow ก่อน",Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
+
         db=new DbHelper(this);
         LinearLayout root=Ui.vertical(this);
-        root.addView(Ui.title(this,"Affiliate Product Analyzer",24));
-        root.addView(Ui.body(this,"ใช้หน้า Shopee Affiliate ที่ Login อยู่ เลือก ‘ขายดี’ และ/หรือ ‘ค่าคอมพิเศษ’ แล้วสแกน ระบบจะจัดอันดับจากยอดขาย + Commission + Extra Comm + ช่วงราคา"));
-        Button open=Ui.button(this,"เปิดหน้า Affiliate Products"); root.addView(open);
-        Button best=Ui.button(this,"เลือกตัวกรอง: ขายดี"); root.addView(best);
-        Button extra=Ui.button(this,"เลือกตัวกรอง: ค่าคอมพิเศษ / Extra Comm"); root.addView(extra);
-        Button scan=Ui.button(this,"🔎 สแกน + วิเคราะห์สินค้าที่เห็น"); root.addView(scan);
-        Button top=Ui.button(this,"ดู Top Products ที่วิเคราะห์แล้ว"); root.addView(top);
-        status=Ui.body(this,"พร้อมสแกน"); root.addView(status);
+        root.setPadding(Ui.dp(this,8),Ui.dp(this,6),Ui.dp(this,8),Ui.dp(this,8));
+        root.addView(Ui.title(this,"Affiliate Product Analyzer",22));
+        root.addView(Ui.body(this,"เลือกหน้าสินค้า Affiliate แล้วสแกน ระบบจะจัดอันดับจากยอดขาย + Commission + Extra Comm + ช่วงราคา"));
+
+        LinearLayout actions=new LinearLayout(this);
+        actions.setOrientation(LinearLayout.HORIZONTAL);
+        Button open=compact("สินค้า");
+        Button best=compact("ขายดี");
+        Button extra=compact("Extra Comm");
+        Button scan=compact("🔎 สแกน");
+        actions.addView(open,new LinearLayout.LayoutParams(0,Ui.dp(this,42),1f));
+        actions.addView(best,new LinearLayout.LayoutParams(0,Ui.dp(this,42),1f));
+        actions.addView(extra,new LinearLayout.LayoutParams(0,Ui.dp(this,42),1.15f));
+        actions.addView(scan,new LinearLayout.LayoutParams(0,Ui.dp(this,42),1f));
+        root.addView(actions);
+
+        LinearLayout tools=new LinearLayout(this);
+        tools.setOrientation(LinearLayout.HORIZONTAL);
+        Button top=compact("⇈");
+        Button up=compact("▲");
+        Button down=compact("▼");
+        Button bottom=compact("⇊");
+        Button verify=compact("◎");
+        Button minus=compact("−");
+        Button plus=compact("+");
+        Button topProducts=compact("Top");
+        tools.addView(top,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(up,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(down,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(bottom,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(verify,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(minus,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(plus,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1f));
+        tools.addView(topProducts,new LinearLayout.LayoutParams(0,Ui.dp(this,34),1.2f));
+        root.addView(tools);
+
+        status=Ui.body(this,"พร้อมสแกน");
+        status.setSingleLine(true);
+        status.setEllipsize(TextUtils.TruncateAt.END);
+        root.addView(status,new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,Ui.dp(this,30)));
 
         web=new WebView(this);
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1f); web.setLayoutParams(lp);
-        WebSettings ws=web.getSettings(); ws.setJavaScriptEnabled(true); ws.setDomStorageEnabled(true); ws.setDatabaseEnabled(true);
-        CookieManager.getInstance().setAcceptCookie(true); CookieManager.getInstance().setAcceptThirdPartyCookies(web,true);
-        web.setWebViewClient(new WebViewClient()); web.setWebChromeClient(new WebChromeClient()); web.addJavascriptInterface(new Bridge(),"CommiBridge"); root.addView(web);
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,0,1f);
+        web.setLayoutParams(lp);
+        WebViewPageTools.configure(web);
+        CookieManager.getInstance().setAcceptCookie(true);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(web,true);
+
+        web.setWebViewClient(new WebViewClient(){
+            @Override public boolean shouldOverrideUrlLoading(WebView view,String url) {
+                return ShopeeUrlRouter.handle(ProductScannerActivity.this,view,url);
+            }
+
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url=request==null||request.getUrl()==null?null:request.getUrl().toString();
+                return ShopeeUrlRouter.handle(ProductScannerActivity.this,view,url);
+            }
+
+            @Override public void onPageFinished(WebView view,String url) {
+                super.onPageFinished(view,url);
+                status.setText("Affiliate • "+WebViewPageTools.shortLocation(url));
+                if(url!=null&&(url.contains("/verify/")||url.contains("traffic")||url.contains("captcha"))) {
+                    view.postDelayed(() -> WebViewPageTools.focusVerification(view),700);
+                }
+            }
+        });
+        web.setWebChromeClient(new WebChromeClient());
+        web.addJavascriptInterface(new Bridge(),"CommiBridge");
+        root.addView(web);
 
         open.setOnClickListener(v -> web.loadUrl(AFFILIATE_URL));
         best.setOnClickListener(v -> clickText(new String[]{"ขายดี","Best Seller","สินค้าขายดี"}));
         extra.setOnClickListener(v -> clickText(new String[]{"ค่าคอมพิเศษ","Extra Comm","Extra Commission"}));
         scan.setOnClickListener(v -> injectScanner());
-        top.setOnClickListener(v -> startActivity(new android.content.Intent(this,ProductListActivity.class)));
-        web.loadUrl(AFFILIATE_URL); setContentView(root);
+        topProducts.setOnClickListener(v -> startActivity(new android.content.Intent(this,ProductListActivity.class)));
+        top.setOnClickListener(v -> WebViewPageTools.toTop(web));
+        up.setOnClickListener(v -> WebViewPageTools.scroll(web,-1));
+        down.setOnClickListener(v -> WebViewPageTools.scroll(web,1));
+        bottom.setOnClickListener(v -> WebViewPageTools.toBottom(web));
+        verify.setOnClickListener(v -> WebViewPageTools.focusVerification(web));
+        minus.setOnClickListener(v -> WebViewPageTools.zoomOut(web));
+        plus.setOnClickListener(v -> WebViewPageTools.zoomIn(web));
+
+        web.loadUrl(AFFILIATE_URL);
+        setContentView(root);
+    }
+
+    private Button compact(String label) {
+        Button b=new Button(this);
+        b.setText(label);
+        b.setTextSize(12);
+        b.setAllCaps(false);
+        b.setMinHeight(0);
+        b.setMinimumHeight(0);
+        b.setPadding(Ui.dp(this,2),0,Ui.dp(this,2),0);
+        return b;
     }
 
     private void clickText(String[] labels) {
-        StringBuilder arr=new StringBuilder("["); for(int i=0;i<labels.length;i++){ if(i>0)arr.append(','); arr.append('"').append(labels[i].replace("\"","\\\"")).append('"'); } arr.append(']');
+        StringBuilder arr=new StringBuilder("[");
+        for(int i=0;i<labels.length;i++){
+            if(i>0)arr.append(',');
+            arr.append('"').append(labels[i].replace("\"","\\\"")).append('"');
+        }
+        arr.append(']');
         String js="(function(){var ls="+arr+";var es=document.querySelectorAll('button,label,[role=tab],[role=button],span,div');for(var j=0;j<ls.length;j++){for(var i=0;i<es.length;i++){var t=(es[i].innerText||es[i].textContent||'').trim();if(t===ls[j]||t.indexOf(ls[j])>=0){var e=es[i];while(e&&e!==document.body&&!((e.tagName==='BUTTON')||e.getAttribute('role')==='button'||e.getAttribute('role')==='tab'||e.tagName==='LABEL'))e=e.parentElement;(e||es[i]).click();return 'clicked:'+ls[j];}}}return 'not-found';})()";
         web.evaluateJavascript(js,value -> status.setText("Filter: "+value));
     }
@@ -63,7 +150,16 @@ public class ProductScannerActivity extends Activity {
 
     private class Bridge {
         @JavascriptInterface public void onProducts(final String json) {
-            runOnUiThread(() -> { try { JSONArray arr=new JSONArray(json); db.importProducts(arr); status.setText("พบ "+arr.length()+" รายการ • เรียงตาม Affiliate Score"); Toast.makeText(ProductScannerActivity.this,"วิเคราะห์ "+arr.length()+" สินค้าแล้ว",Toast.LENGTH_LONG).show(); } catch(Exception e){ status.setText("สแกนไม่สำเร็จ: "+e.getMessage()); } });
+            runOnUiThread(() -> {
+                try {
+                    JSONArray arr=new JSONArray(json);
+                    db.importProducts(arr);
+                    status.setText("พบ "+arr.length()+" รายการ • เรียงตาม Affiliate Score");
+                    Toast.makeText(ProductScannerActivity.this,"วิเคราะห์ "+arr.length()+" สินค้าแล้ว",Toast.LENGTH_LONG).show();
+                } catch(Exception e){
+                    status.setText("สแกนไม่สำเร็จ: "+e.getMessage());
+                }
+            });
         }
     }
 }
