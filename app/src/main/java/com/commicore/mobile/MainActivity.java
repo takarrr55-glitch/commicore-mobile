@@ -42,15 +42,30 @@ public class MainActivity extends Activity {
         });
         l.addView(access);
 
-        Button scan = Ui.button(this,"② สแกนสินค้า Shopee");
+        Button login = Ui.button(this,"② Login Shopee + Google Flow");
+        login.setOnClickListener(new View.OnClickListener(){
+            @Override public void onClick(View v){
+                startActivity(new Intent(MainActivity.this,LoginSetupActivity.class));
+            }
+        });
+        l.addView(login);
+
+        Button scan = Ui.button(this,"③ สแกนสินค้า Shopee");
         scan.setOnClickListener(new View.OnClickListener(){
             @Override public void onClick(View v){
+                if(!LoginPrefs.ready(MainActivity.this)) {
+                    Toast.makeText(MainActivity.this,
+                        "กรุณา Login Shopee และ Google Flow ก่อนเข้า Scanner",
+                        Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(MainActivity.this,LoginSetupActivity.class));
+                    return;
+                }
                 startActivity(new Intent(MainActivity.this,ProductScannerActivity.class));
             }
         });
         l.addView(scan);
 
-        Button products = Ui.button(this,"③ รายการสินค้าที่สแกน");
+        Button products = Ui.button(this,"④ รายการสินค้าที่สแกน");
         products.setOnClickListener(new View.OnClickListener(){
             @Override public void onClick(View v){
                 startActivity(new Intent(MainActivity.this,ProductListActivity.class));
@@ -91,7 +106,12 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         if(status != null) {
-            status.setText("Accessibility: " + (isAccessibilityEnabled() ? "✅ เปิดแล้ว" : "⚠️ ยังไม่เปิด"));
+            status.setText(
+                "Accessibility: " + (isAccessibilityEnabled() ? "✅ เปิดแล้ว" : "⚠️ ยังไม่เปิด") +
+                "\nShopee Login: " + (LoginPrefs.shopeeReady(this) ? "✅ ยืนยันแล้ว" : "⚠️ ยังไม่ยืนยัน") +
+                "\nGoogle Flow Login: " + (LoginPrefs.flowReady(this) ? "✅ ยืนยันแล้ว" : "⚠️ ยังไม่ยืนยัน") +
+                "\nScanner: " + (LoginPrefs.ready(this) ? "✅ พร้อม" : "🔒 รอ Login")
+            );
         }
     }
 
